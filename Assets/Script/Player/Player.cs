@@ -106,12 +106,12 @@ public class Player : MonoBehaviour, IHurtbox {
 
         // HPが0の場合
         if (model.IsDead) {
-            StartDead();
+            BeginDead();
             return;
         }
 
         // 怯み
-        StartStagger();
+        BeginStagger();
     }
 
     public void EquipRHandWeapon(ItemModel item) {
@@ -207,13 +207,13 @@ public class Player : MonoBehaviour, IHurtbox {
         // ローリング回避入力
         if (inp.A_Button) {
             // ローリング回避開始
-            StartDodgeRoll();
+            BeginDodgeRoll();
         }
 
         // 攻撃1入力
         if (inp.Attack) {
             // 攻撃1開始
-            StartAttack1();
+            BeginAttack1();
         }
 
         // 使用ボタン入力
@@ -308,28 +308,28 @@ public class Player : MonoBehaviour, IHurtbox {
         if (!isFallPosture && !groundDetr.IsLanding) {
             // 落下開始
             isFallPosture = true;
-            StartFallAnim();
+            BeginFallAnim();
         } else if (isFallPosture && groundDetr.IsLanding) {
             // 着地
             isFallPosture = false;
-            FinishFallAnim();
+            EndFallAnim();
         }
     }
 
     // 落下モーション開始
-    void StartFallAnim() {
+    void BeginFallAnim() {
         anim.SetFloat(aniParam.Speed, 0f);
         anim.SetTrigger(aniParam.Fall);
         anim.SetBool(aniParam.IsGrounded, false);
     }
 
     // 落下モーション終了(着地)
-    void FinishFallAnim() {
+    void EndFallAnim() {
         anim.SetBool(aniParam.IsGrounded, true);
     }
 
 
-    void StartLocomotion() {
+    void BeginLocomotion() {
         state = PlayerState.LOCOMOTION;
 
         actionLock = false;
@@ -340,7 +340,7 @@ public class Player : MonoBehaviour, IHurtbox {
         currentFixedUpdAction = inputLocomotion;
     }
 
-    public void StartAttack1() {
+    public void BeginAttack1() {
         state = PlayerState.ATTACK;
 
         actionLock = true;
@@ -357,18 +357,18 @@ public class Player : MonoBehaviour, IHurtbox {
         currentFixedUpdAction = attackLocomotion;
     }
 
-    public void FinishAttack1() {
+    public void EndAttack1() {
         itemInventory.RHandWeapon.DisableHit();
         itemInventory.RHandWeapon.SetSafety(true);
 
         anim.ResetTrigger(aniParam.Attack);
 
         if (state == PlayerState.ATTACK) {
-            StartLocomotion();
+            BeginLocomotion();
         }
     }
 
-    public void StartDodgeRoll() {
+    public void BeginDodgeRoll() {
         state = PlayerState.DODGEROLL;
 
         enableRootMotion = false;
@@ -380,11 +380,11 @@ public class Player : MonoBehaviour, IHurtbox {
         currentFixedUpdAction = dodgeRollLocomotion;
     }
 
-    public void FinishDodgeRoll() {
-        StartLocomotion();
+    public void EndDodgeRoll() {
+        BeginLocomotion();
     }
 
-    public void StartStagger() {
+    public void BeginStagger() {
         state = PlayerState.STAGGER;
 
         actionLock = true;
@@ -400,11 +400,11 @@ public class Player : MonoBehaviour, IHurtbox {
         currentFixedUpdAction = null;
     }
 
-    public void FinishStagger() {
-        StartLocomotion();
+    public void EndStagger() {
+        BeginLocomotion();
     }
 
-    public void StartDead() {
+    public void BeginDead() {
         state = PlayerState.DEAD;
 
         actionLock = true;
@@ -422,15 +422,15 @@ public class Player : MonoBehaviour, IHurtbox {
 
     #region StateMachineEventCallback
     void OnAttackMotionFade() {
-        FinishAttack1();
+        EndAttack1();
     }
 
     void OnDodgeRollMotionFade() {
-        FinishDodgeRoll();
+        EndDodgeRoll();
     }
 
     void OnStaggerMotionFade() {
-        FinishStagger();
+        EndStagger();
     }
     #endregion
 

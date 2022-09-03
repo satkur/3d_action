@@ -60,7 +60,7 @@ public class Skeleton : MonoBehaviour, IHurtbox {
         navAgent.updateRotation = false;
 
         // 巡回状態へ移行する
-        StartPatrol();
+        BeginPatrol();
 
         // カスタム重力初期化
         rb.useGravity = false;
@@ -93,10 +93,10 @@ public class Skeleton : MonoBehaviour, IHurtbox {
                 // 到着を検知
                 else if (navAgent.hasPath && navAgent.remainingDistance < 0.4f) {
                     // 立ち止まった後に次の地点へ巡回を再開する
-                    StartCoroutine(RestartPatrolCoroutine(5));
+                    StartCoroutine(BeginPatrolCoroutine(5));
                 } else if (!navAgent.hasPath) {
                     // 経路を探知できない場合は待機状態へ移行する
-                    StartWaiting();
+                    BeginWaiting();
                 }
                 break;
 
@@ -117,7 +117,7 @@ public class Skeleton : MonoBehaviour, IHurtbox {
                     // NavMeshAgentのシミュレーション位置を強制的に現在位置にする
                     navAgent.Warp(transform.position);
                     // 立ち止まった後に次の地点へ巡回を再開する
-                    StartCoroutine(RestartPatrolCoroutine(4));
+                    StartCoroutine(BeginPatrolCoroutine(4));
                 }
                 break;
 
@@ -304,7 +304,7 @@ public class Skeleton : MonoBehaviour, IHurtbox {
         rb.velocity = velocity;
     }
 
-    void StartWaiting() {
+    void BeginWaiting() {
         state = State.WAIT;
         navAgent.isStopped = true;
 
@@ -312,7 +312,7 @@ public class Skeleton : MonoBehaviour, IHurtbox {
         anim.SetFloat("SpeedMult", 0f);
     }
 
-    void StartPatrol() {
+    void BeginPatrol() {
         state = State.PATROL;
         navAgent.isStopped = false;
 
@@ -327,13 +327,13 @@ public class Skeleton : MonoBehaviour, IHurtbox {
         navAgent.SetDestination(patrolTargetPos);
     }
 
-    IEnumerator RestartPatrolCoroutine(int second) {
-        StartWaiting();
+    IEnumerator BeginPatrolCoroutine(int second) {
+        BeginWaiting();
 
         yield return new WaitForSeconds(second);
 
         if (state == State.WAIT) {
-            StartPatrol();
+            BeginPatrol();
         }
     }
 
